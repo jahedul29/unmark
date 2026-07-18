@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Unmark — Tailwind theme + design tokens.
+   Component styling lives as utilities in the JSX. This file holds only what
+   utilities can't express: the Tailwind import, the design-token theme, the
+   light/dark variables, base element defaults, pseudo-elements (glyph cutout,
+   switch knob, range thumb), and keyframes.
+   ============================================================ */
+
+@theme {
+  --breakpoint-md: 860px;
+
+  --color-bg0: var(--bg0);
+  --color-bg1: var(--bg1);
+  --color-bg2: var(--bg2);
+  --color-bg3: var(--bg3);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+  --color-txt: var(--txt);
+  --color-txt2: var(--txt2);
+  --color-txt3: var(--txt3);
+  --color-accent: var(--accent);
+  --color-accent-hi: var(--accent-hi);
+  --color-onaccent: var(--on-accent);
+  --color-mask: var(--mask);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+}
+
+:root {
+  /* neutrals — DARK (default), cool-biased slate */
+  --bg0: #0f1218;
+  --bg1: #171b22;
+  --bg2: #20262f;
+  --bg3: #2a313c;
+  --line: #313947;
+  --line2: #3d4757;
+  --txt: #e9edf4;
+  --txt2: #9aa4b2;
+  --txt3: #68727f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
+  --overlay: rgba(9, 11, 15, .66);
+
+  --accent: #0fb6d4;
+  --accent-hi: #22cdec;
+  --on-accent: #04232b;
+  --accent-glow: rgba(15, 182, 212, .30);
+
+  --mask: #ff2e63;
+  --warn: #f5a524;
+  --danger: #ff5c4d;
+  --ok: #2fbf71;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg0: #e6e9ef;
+  --bg1: #f4f6f9;
+  --bg2: #ffffff;
+  --bg3: #eceff4;
+  --line: #d7dce4;
+  --line2: #c4ccd8;
+  --txt: #171b22;
+  --txt2: #55606f;
+  --txt3: #828d9c;
+  --shadow: 0 1px 2px rgba(20, 30, 50, .08), 0 8px 24px rgba(20, 30, 50, .07);
+  --overlay: rgba(230, 233, 239, .7);
+  color-scheme: light;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* the app owns the viewport */
+    overscroll-behavior: none;
+  }
+  body {
+    @apply bg-bg0 text-txt;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  kbd {
+    font-family: ui-monospace, monospace;
+    font-size: 11.5px;
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 2px 6px;
+    min-width: 20px;
+    display: inline-flex;
+    justify-content: center;
+    color: var(--txt2);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+/* ---------- pseudo-elements (utilities can't reach ::after / ::-slider-thumb) ---------- */
+
+/* brand glyph — the "cut" that turns the gradient square into a U */
+.glyph::after {
+  content: "";
+  position: absolute;
+  inset: 7px 7px 7px 13px;
+  background: var(--bg1);
+  border-radius: 0 20px 20px 0;
+}
+.big-glyph::after {
+  content: "";
+  position: absolute;
+  inset: 16px 16px 16px 30px;
+  background: var(--bg1);
+  border-radius: 0 40px 40px 0;
+}
+
+/* before/after switch knob */
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left .16s;
+}
+.switch[aria-pressed="true"]::after { left: 18px; }
+
+/* range slider track + thumb */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--bg3);
+  outline: none;
+  cursor: pointer;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+  cursor: pointer;
+}
+.range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bg1);
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.range:focus-visible { box-shadow: 0 0 0 3px var(--accent-glow); }
+
+/* ---------- keyframes ---------- */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes toastin { from { opacity: 0; transform: translateY(8px); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes sheetup { from { transform: translateY(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::after, *::before { transition: none !important; animation: none !important; }
+}
