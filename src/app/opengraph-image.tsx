@@ -23,12 +23,26 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", alignItems: "center", gap: 26, marginBottom: 44 }}>
           <div
             style={{
+              position: "relative",
+              display: "flex",
               width: 92,
               height: 92,
               borderRadius: 22,
               background: "linear-gradient(135deg, #0fb6d4, #ff2e63)",
             }}
-          />
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 27,
+                left: 50,
+                width: 15,
+                height: 38,
+                borderRadius: 8,
+                background: "#0f1218",
+              }}
+            />
+          </div>
           <div style={{ fontSize: 54, fontWeight: 800 }}>Unmark</div>
         </div>
         <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1.02, letterSpacing: -2 }}>
