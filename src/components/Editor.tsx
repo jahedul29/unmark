@@ -263,14 +263,14 @@ export default function Editor() {
         <TopBar />
         <div className="flex min-h-0 flex-1">
           <ToolRail />
-          <div className="relative flex-1 overflow-hidden">
+          <div className="relative min-w-0 flex-1 overflow-hidden">
             <CanvasView />
             {!hasImage ? <EmptyState /> : null}
-            <MobileControls />
           </div>
           <Inspector />
         </div>
         <StatusBar />
+        <MobileControls />
         <Toasts />
       </div>
     </EditorContext.Provider>

@@ -42,7 +42,7 @@ export default function MobileControls() {
       ) : null}
 
       <nav
-        className="bottom-bar absolute inset-x-0 bottom-0 z-[20] flex items-center justify-around gap-1 border-t border-line bg-bg1 px-[10px] pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] md:hidden"
+        className="bottom-bar z-[20] flex shrink-0 items-center justify-around gap-1 border-t border-line bg-bg1 px-[10px] pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] md:hidden"
         aria-label="Tools"
       >
         <ToolButtons size="bar" />
