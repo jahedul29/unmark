@@ -45,7 +45,7 @@ export default function EmptyState() {
         onDrop={onDrop}
       >
         <div
-          className="big-glyph relative mx-auto mb-5 h-14 w-14 rounded-[15px] bg-[conic-gradient(from_210deg,var(--accent),var(--mask))]"
+          className="big-glyph relative mx-auto mb-5 h-14 w-14 rounded-[15px] bg-[linear-gradient(135deg,var(--accent),var(--mask))]"
           aria-hidden="true"
         />
         <h2 className="mb-2 text-xl tracking-[-0.01em]">Drop an image to unmark it</h2>
