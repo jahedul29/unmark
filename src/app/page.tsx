@@ -211,9 +211,14 @@ export default function Landing() {
       <footer className="border-t border-line px-5 py-8 sm:px-8">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 text-[12.5px] text-txt3 sm:flex-row">
           <span>Unmark — a free voltbyte tool.</span>
-          <Link href="/editor" className="text-txt2 hover:text-txt">
-            Open the editor →
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/how-to-remove-a-watermark" className="text-txt2 hover:text-txt">
+              How to remove a watermark
+            </Link>
+            <Link href="/editor" className="text-txt2 hover:text-txt">
+              Open the editor →
+            </Link>
+          </div>
         </div>
       </footer>
     </main>
