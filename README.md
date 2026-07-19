@@ -74,9 +74,15 @@ hook that is stripped from production builds.
 
 ## Deploy (Vercel)
 
-Framework preset **Next.js**; output directory **`out`**. The whole app is static, so no
-environment variables or server config are needed. Point the `unmark.voltbyte.online`
-subdomain at the deployment.
+This is a **static export** (`output: 'export'`), so it must be served as static files, **not**
+through Vercel's Next.js server builder — otherwise Vercel looks for `out/routes-manifest.json`
+(a server artifact a static export never produces) and the build fails.
+
+`vercel.json` handles this: `framework: null` + `buildCommand: next build` + `outputDirectory: out`
++ `cleanUrls: true` (so `/editor` serves `editor.html`). In the Vercel dashboard, leave the
+**Framework Preset as "Other"** (or let `vercel.json` govern) and don't override the output
+directory. No environment variables or server config are needed. Point the
+`unmark.voltbyte.online` subdomain at the deployment.
 
 See [`SPEC.md`](./SPEC.md) for the full design and [`FEATURES.md`](./FEATURES.md) for the
 feature checklist.
