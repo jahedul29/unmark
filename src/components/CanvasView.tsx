@@ -199,7 +199,7 @@ export default function CanvasView() {
     <div className="absolute inset-0 overflow-hidden bg-bg0" ref={wrapRef}>
       <canvas
         ref={canvasRef}
-        className={`absolute inset-0 block h-full w-full ${cursorClass}`}
+        className={`absolute inset-0 block h-full w-full touch-none ${cursorClass}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}

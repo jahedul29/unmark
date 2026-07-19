@@ -74,11 +74,8 @@
 @layer base {
   html,
   body {
-    height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* the app owns the viewport */
-    overscroll-behavior: none;
   }
   body {
     @apply bg-bg0 text-txt;
@@ -87,7 +84,10 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
-    touch-action: none;
+  }
+  .editor-root {
+    overflow: hidden;
+    overscroll-behavior: none;
   }
   .mono {
     font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;

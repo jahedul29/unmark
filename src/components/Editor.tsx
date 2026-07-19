@@ -256,7 +256,7 @@ export default function Editor() {
   return (
     <EditorContext.Provider value={api}>
       <div
-        className="relative flex h-[100dvh] w-screen flex-col bg-bg0"
+        className="editor-root relative flex h-[100dvh] w-screen flex-col bg-bg0"
         onDrop={onDrop}
         onDragOver={(e) => e.preventDefault()}
       >
