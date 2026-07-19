@@ -28,7 +28,7 @@ try {
   });
   page.on("pageerror", (e) => pageErrors.push(String(e)));
 
-  await page.goto(BASE, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.goto(BASE + "/editor", { waitUntil: "domcontentloaded", timeout: 30000 });
 
   await page.waitForFunction(() => !!document.querySelector(".drop"), { timeout: 15000 });
   ok("editor hydrates, empty-state dropzone shown");

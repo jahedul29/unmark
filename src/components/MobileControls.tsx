@@ -7,13 +7,15 @@ import ToolButtons from "./ToolButtons";
 import ToolButton from "./ui/ToolButton";
 import Button from "./ui/Button";
 import Controls from "./Controls";
-import { IconReset, IconRun, IconSliders } from "./icons";
+import ThemeToggle from "./ThemeToggle";
+import { IconCopy, IconDownload, IconReset, IconRun, IconSliders } from "./icons";
 
 export default function MobileControls() {
   const api = useEditor();
   const hasImage = useStore((s) => s.hasImage);
   const busy = useStore((s) => s.busy);
   const coverage = useStore((s) => s.coverage);
+  const clipboardOk = useStore((s) => s.clipboardOk);
   const sheetOpen = useStore((s) => s.sheetOpen);
   const set = useStore((s) => s.set);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -68,6 +70,19 @@ export default function MobileControls() {
             ref={sheetRef}
           >
             <div className="mx-auto mb-[6px] mt-1 h-1 w-10 shrink-0 rounded-[3px] bg-line2" />
+            <div className="flex items-center gap-2">
+              <Button onClick={api.download} disabled={!hasImage} className="flex-1 justify-center">
+                <IconDownload />
+                Download
+              </Button>
+              {clipboardOk ? (
+                <Button onClick={api.copy} disabled={!hasImage} className="flex-1 justify-center">
+                  <IconCopy />
+                  Copy
+                </Button>
+              ) : null}
+              <ThemeToggle />
+            </div>
             <Controls />
             <Button variant="danger" onClick={api.reset} disabled={!hasImage || busy} className="justify-center">
               <IconReset />

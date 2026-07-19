@@ -21,7 +21,7 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 800 });
   page.on("pageerror", (e) => pageErrors.push(String(e)));
-  await page.goto(BASE, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.goto(BASE + "/editor", { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForFunction(() => !!window.__unmark, { timeout: 15000 });
 
   await page.evaluate(async () => {
