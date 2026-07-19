@@ -72,7 +72,7 @@ export default function Guide() {
     <main className="min-h-[100dvh] bg-bg0 text-txt">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
 
-      <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-5 sm:px-8">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
         <Link href="/" className="flex items-center gap-[9px] text-lg font-[680] tracking-[-0.01em]">
           <span className="glyph relative h-7 w-7 shrink-0 rounded-lg bg-[conic-gradient(from_210deg,var(--accent),var(--mask))]" aria-hidden="true" />
           Unmark
@@ -88,7 +88,7 @@ export default function Guide() {
         </div>
       </header>
 
-      <article className="mx-auto w-full max-w-3xl px-5 pb-24 pt-6 sm:px-8">
+      <article className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 sm:px-8">
         <nav className="text-[12.5px] text-txt3">
           <Link href="/" className="hover:text-txt2">
             Home
@@ -164,7 +164,7 @@ export default function Guide() {
       </article>
 
       <footer className="border-t border-line px-5 py-8 sm:px-8">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 text-[12.5px] text-txt3 sm:flex-row">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 text-[12.5px] text-txt3 sm:flex-row">
           <span>Unmark — a free voltbyte tool.</span>
           <Link href="/" className="text-txt2 hover:text-txt">
             ← Back home
