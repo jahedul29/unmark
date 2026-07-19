@@ -32,7 +32,7 @@ export default function TopBar() {
     <header className="flex h-[52px] items-center gap-[10px] border-b border-line bg-bg1 px-3 max-md:gap-[6px] max-md:px-2">
       <Link href="/" className="flex items-center gap-[9px] font-[650] tracking-[-0.01em]" title="Unmark home">
         <span
-          className="glyph relative h-6 w-6 shrink-0 rounded-[7px] bg-[conic-gradient(from_210deg,var(--accent),var(--mask))]"
+          className="glyph relative h-6 w-6 shrink-0 rounded-[7px] bg-[linear-gradient(135deg,var(--accent),var(--mask))]"
           aria-hidden="true"
         />
         <span className="hidden md:inline">Unmark</span>
