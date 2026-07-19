@@ -1,4 +1,10 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
+
+const logoDataUri =
+  "data:image/svg+xml;base64," +
+  readFileSync(join(process.cwd(), "public", "logo.svg")).toString("base64");
 
 export const alt = "Unmark — free watermark remover";
 export const size = { width: 1200, height: 630 };
@@ -21,31 +27,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 26, marginBottom: 44 }}>
-          <div
-            style={{
-              position: "relative",
-              display: "flex",
-              width: 92,
-              height: 92,
-              borderRadius: 22,
-              background: "linear-gradient(135deg, #0fb6d4, #ff2e63)",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 23,
-                left: 43,
-                width: 26,
-                height: 46,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                borderTopRightRadius: 23,
-                borderBottomRightRadius: 23,
-                background: "#171b22",
-              }}
-            />
-          </div>
+          <img width={92} height={92} src={logoDataUri} alt="" />
           <div style={{ fontSize: 54, fontWeight: 800 }}>Unmark</div>
         </div>
         <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1.02, letterSpacing: -2 }}>

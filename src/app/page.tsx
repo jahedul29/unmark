@@ -82,7 +82,7 @@ export default function Landing() {
 
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
         <div className="flex items-center gap-[9px] text-lg font-[680] tracking-[-0.01em]">
-          <span className="glyph relative h-7 w-7 shrink-0 rounded-lg bg-[linear-gradient(135deg,var(--accent),var(--mask))]" aria-hidden="true" />
+          <img src="/logo.svg" alt="" className="h-7 w-7 shrink-0" />
           Unmark
         </div>
         <div className="flex items-center gap-2">
