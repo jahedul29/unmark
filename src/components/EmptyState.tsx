@@ -25,7 +25,7 @@ export default function EmptyState() {
   };
 
   return (
-    <div className="absolute inset-0 grid place-items-center bg-bg0 p-6">
+    <div className="absolute inset-0 grid place-items-center overflow-y-auto bg-bg0 px-6 pb-28 pt-6 md:p-6">
       <div
         className={
           "drop w-[min(560px,92%)] rounded-[18px] border-2 border-dashed bg-bg1 px-8 py-12 text-center transition-colors " +
