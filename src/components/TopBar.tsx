@@ -74,7 +74,7 @@ export default function TopBar() {
           <IconRedo />
         </IconButton>
 
-        <span className="mx-1 h-[22px] w-px shrink-0 bg-line" />
+        <span className="mx-1 hidden h-[22px] w-px shrink-0 bg-line md:block" />
 
         <div className="inline-flex items-center gap-[9px] whitespace-nowrap rounded-[20px] border border-line bg-bg2 py-1 pl-[11px] pr-[5px] text-xs text-txt2 max-md:pl-2">
           <span className="hidden md:inline">Before / After</span>
@@ -91,21 +91,25 @@ export default function TopBar() {
           />
         </div>
 
-        <span className="mx-1 h-[22px] w-px shrink-0 bg-line" />
+        <span className="mx-1 hidden h-[22px] w-px shrink-0 bg-line md:block" />
 
         <Button onClick={api.download} disabled={!hasImage} title="Download" className="max-md:h-10">
           <IconDownload />
           <span className="hidden md:inline">Download</span>
         </Button>
         {clipboardOk ? (
-          <Button onClick={api.copy} disabled={!hasImage} title="Copy to clipboard" className="max-md:h-10">
-            <IconCopy />
-            <span className="hidden md:inline">Copy</span>
-          </Button>
+          <span className="hidden md:inline-flex">
+            <Button onClick={api.copy} disabled={!hasImage} title="Copy to clipboard">
+              <IconCopy />
+              <span>Copy</span>
+            </Button>
+          </span>
         ) : null}
 
         <span className="mx-1 hidden h-[22px] w-px shrink-0 bg-line md:block" />
-        <ThemeToggle />
+        <span className="hidden md:inline-flex">
+          <ThemeToggle />
+        </span>
       </div>
     </header>
   );
