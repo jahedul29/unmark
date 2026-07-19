@@ -115,17 +115,6 @@
 
 /* ---------- pseudo-elements (utilities can't reach ::after / ::-slider-thumb) ---------- */
 
-/* brand glyph — the "cut" that turns the gradient square into a U */
-.glyph::after,
-.big-glyph::after {
-  content: "";
-  position: absolute;
-  inset: 25% 25% 25% 46.4%;
-  background: var(--bg1);
-  border-radius: 0 50% 50% 0;
-}
-
-/* before/after switch knob */
 .switch::after {
   content: "";
   position: absolute;

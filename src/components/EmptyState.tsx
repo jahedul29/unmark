@@ -44,10 +44,7 @@ export default function EmptyState() {
         onDragLeave={() => setOver(false)}
         onDrop={onDrop}
       >
-        <div
-          className="big-glyph relative mx-auto mb-5 h-14 w-14 rounded-[15px] bg-[linear-gradient(135deg,var(--accent),var(--mask))]"
-          aria-hidden="true"
-        />
+        <img src="/logo.svg" alt="" className="mx-auto mb-5 h-14 w-14" />
         <h2 className="mb-2 text-xl tracking-[-0.01em]">Drop an image to unmark it</h2>
         <p className="mb-[22px] text-sm text-txt2">
           Paint over the watermark, hit Run, and it fills. JPG, PNG, or WebP.

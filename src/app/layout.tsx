@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: "voltbyte" }],
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
+  icons: { icon: "/logo.svg", shortcut: "/logo.svg", apple: "/logo.svg" },
   openGraph: {
     type: "website",
     siteName: "Unmark",
