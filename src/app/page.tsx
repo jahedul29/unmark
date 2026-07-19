@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import { IconBrush, IconDownload, IconRun, IconSparkles, IconUpload } from "@/components/icons";
 
 const STEPS = [
@@ -24,12 +25,15 @@ export default function Landing() {
           <span className="glyph relative h-7 w-7 shrink-0 rounded-lg bg-[conic-gradient(from_210deg,var(--accent),var(--mask))]" aria-hidden="true" />
           Unmark
         </div>
-        <Link
-          href="/editor"
-          className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-[620] text-onaccent transition-colors hover:bg-accent-hi"
-        >
-          Open editor
-        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link
+            href="/editor"
+            className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-[620] text-onaccent transition-colors hover:bg-accent-hi"
+          >
+            Open editor
+          </Link>
+        </div>
       </header>
 
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-14 pt-8 sm:px-8 lg:grid-cols-2 lg:gap-14 lg:pb-24 lg:pt-16">
