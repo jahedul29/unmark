@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { useEditor } from "./editorContext";
 import { ACCEPT_ATTR } from "@/lib/format";
@@ -29,13 +30,13 @@ export default function TopBar() {
 
   return (
     <header className="flex h-[52px] items-center gap-[10px] border-b border-line bg-bg1 px-3 max-md:gap-[6px] max-md:px-2">
-      <div className="flex items-center gap-[9px] font-[650] tracking-[-0.01em]">
+      <Link href="/" className="flex items-center gap-[9px] font-[650] tracking-[-0.01em]" title="Unmark home">
         <span
           className="glyph relative h-6 w-6 shrink-0 rounded-[7px] bg-[conic-gradient(from_210deg,var(--accent),var(--mask))]"
           aria-hidden="true"
         />
         <span className="hidden md:inline">Unmark</span>
-      </div>
+      </Link>
 
       <input ref={fileRef} type="file" accept={ACCEPT_ATTR} hidden onChange={onPick} />
       <IconButton onClick={openFile} title="Open image" aria-label="Open image" className="max-md:h-10 max-md:w-10">
