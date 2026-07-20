@@ -34,6 +34,14 @@ export const IconLasso = (p: P) => (
     <circle cx="6" cy="19" r="1.6" />
   </svg>
 );
+export const IconRepeat = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="4" y="4" width="7" height="7" rx="1.5" />
+    <rect x="13" y="4" width="7" height="7" rx="1.5" />
+    <rect x="4" y="13" width="7" height="7" rx="1.5" />
+    <rect x="13" y="13" width="7" height="7" rx="1.5" />
+  </svg>
+);
 export const IconSparkles = (p: P) => (
   <svg {...base(p)}>
     <path d="m12 3 1.8 4.7L18.5 9l-4.7 1.3L12 15l-1.8-4.7L5.5 9l4.7-1.3Z" />

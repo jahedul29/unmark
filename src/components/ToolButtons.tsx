@@ -3,7 +3,7 @@
 import { useStore } from "@/lib/store";
 import { useEditor } from "./editorContext";
 import ToolButton from "./ui/ToolButton";
-import { IconBrush, IconEraser, IconLasso, IconRect, IconSparkles } from "./icons";
+import { IconBrush, IconEraser, IconLasso, IconRect, IconRepeat, IconSparkles } from "./icons";
 import type { Tool } from "@/lib/types";
 
 const TOOLS: { id: Tool; label: string; key: string; Icon: typeof IconBrush }[] = [
@@ -43,6 +43,15 @@ export default function ToolButtons({ size = "rail" }: { size?: "rail" | "bar" }
         onClick={() => void api.autoSuggest()}
       >
         <IconSparkles />
+      </ToolButton>
+      <ToolButton
+        className={dim}
+        disabled={!hasImage}
+        title="Mask one watermark, then find its repeats"
+        aria-label="Find repeating watermarks"
+        onClick={() => void api.findRepeats()}
+      >
+        <IconRepeat />
       </ToolButton>
     </>
   );

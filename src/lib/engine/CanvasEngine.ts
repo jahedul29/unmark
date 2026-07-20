@@ -412,6 +412,29 @@ export class CanvasEngine {
     return this.working;
   }
 
+  getMaskBox(): Box | null {
+    if (!this.mask || !this.maskCtx) return null;
+    const d = this.maskCtx.getImageData(0, 0, this.W0, this.H0).data;
+    let minX = this.W0, minY = this.H0, maxX = -1, maxY = -1;
+    for (let y = 0; y < this.H0; y++) {
+      for (let x = 0; x < this.W0; x++) {
+        if (d[(y * this.W0 + x) * 4 + 3] > 10) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) return null;
+    return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  }
+
+  getWorkingImageData(): ImageData | null {
+    if (!this.working) return null;
+    return this.working.getContext("2d", { willReadFrequently: true })!.getImageData(0, 0, this.W0, this.H0);
+  }
+
 
   private updateCoverage() {
     if (!this.mask) return;

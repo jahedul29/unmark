@@ -7,7 +7,7 @@ import InfoDot from "./InfoDot";
 import type { Algo } from "@/lib/types";
 
 const SEG_BTN =
-  "h-[29px] flex-1 cursor-pointer rounded-md border-none bg-transparent text-xs font-[550] text-txt2 transition-colors aria-[pressed=true]:bg-accent aria-[pressed=true]:font-semibold aria-[pressed=true]:text-onaccent aria-[pressed=false]:hover:bg-bg3 aria-[pressed=false]:hover:text-txt";
+  "h-[29px] flex-1 cursor-pointer whitespace-nowrap rounded-md border-none bg-transparent text-xs font-[550] text-txt2 transition-colors aria-[pressed=true]:bg-accent aria-[pressed=true]:font-semibold aria-[pressed=true]:text-onaccent aria-[pressed=false]:hover:bg-bg3 aria-[pressed=false]:hover:text-txt";
 
 export default function Controls() {
   const api = useEditor();
@@ -87,15 +87,19 @@ export default function Controls() {
         <div className="insp-title flex items-center gap-[7px] text-[11px] font-[650] uppercase tracking-[0.13em] text-txt3">
           Engine
           <InfoDot label="Inpaint engine">
-            <b>AI eraser</b> (MI-GAN) generates plausible content to fill the mask — best quality,
-            no smudges. First use downloads a ~30&nbsp;MB model, then runs offline on your device.{" "}
-            <b>Fast</b> uses classical OpenCV (Telea / Navier–Stokes): instant, but diffuses nearby
-            colors, so it can smear across high-contrast edges.
+            <b>AI eraser</b> (MI-GAN, ~30&nbsp;MB) — generative fill, great for small or text
+            watermarks; downloads once, then runs offline. <b>Best</b> (LaMa, ~200&nbsp;MB) —
+            highest quality on large, wide, or complex marks; slower, with a big one-time download.{" "}
+            <b>Fast</b> — classical OpenCV (Telea / Navier–Stokes): instant, but smears across
+            high-contrast edges.
           </InfoDot>
         </div>
         <div className="flex gap-[3px] rounded-lg border border-line bg-bg2 p-[3px]" role="group" aria-label="Engine">
           <button className={SEG_BTN} aria-pressed={s.engine === "ml"} onClick={() => s.set("engine", "ml")}>
             AI eraser
+          </button>
+          <button className={SEG_BTN} aria-pressed={s.engine === "lama"} onClick={() => s.set("engine", "lama")}>
+            Best
           </button>
           <button className={SEG_BTN} aria-pressed={s.engine === "classic"} onClick={() => s.set("engine", "classic")}>
             Fast
@@ -105,6 +109,11 @@ export default function Controls() {
           <div className="rounded-md border border-line bg-bg2 px-3 py-2 text-[11.5px] leading-relaxed text-txt3">
             Generative fill — reconstructs texture instead of smearing. First run downloads a
             ~30&nbsp;MB model (cached; offline after).
+          </div>
+        ) : s.engine === "lama" ? (
+          <div className="rounded-md border border-line bg-bg2 px-3 py-2 text-[11.5px] leading-relaxed text-txt3">
+            Highest quality — best for large, wide, or complex watermarks. First run downloads a
+            ~200&nbsp;MB model (cached; offline after) and runs slower than AI eraser.
           </div>
         ) : (
           <>
