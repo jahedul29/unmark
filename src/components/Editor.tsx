@@ -11,7 +11,7 @@ import { loadImageFile } from "@/lib/image/load";
 import { downloadImage, copyImageToClipboard, clipboardSupported } from "@/lib/image/exportImage";
 import { UnmarkFileError } from "@/lib/format";
 import { useShortcuts } from "@/lib/hooks/useShortcuts";
-import { useBeforeUnload } from "@/lib/hooks/useBeforeUnload";
+import { useReloadGuard } from "@/lib/hooks/useReloadGuard";
 import { EditorContext, type EditorApi } from "./editorContext";
 import type { Box } from "@/lib/types";
 
@@ -23,6 +23,7 @@ import CanvasView from "./CanvasView";
 import EmptyState from "./EmptyState";
 import MobileControls from "./MobileControls";
 import Toasts from "./Toasts";
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function Editor() {
   const setMany = useStore((s) => s.setMany);
@@ -39,6 +40,7 @@ export default function Editor() {
   const showBefore = useStore((s) => s.showBefore);
 
   const [suggest, setSuggest] = useState<Box[] | null>(null);
+  const [reloadOpen, setReloadOpen] = useState(false);
 
   const providerRef = useRef<BrowserInpaintProvider | null>(null);
   const mlRef = useRef<MLInpaintProvider | null>(null);
@@ -274,7 +276,7 @@ export default function Editor() {
   );
 
   useShortcuts(api);
-  useBeforeUnload(hasImage);
+  const reloadNow = useReloadGuard(hasImage, useCallback(() => setReloadOpen(true), []));
 
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
@@ -315,6 +317,17 @@ export default function Editor() {
         <StatusBar />
         <MobileControls />
         <Toasts />
+        {reloadOpen ? (
+          <ConfirmDialog
+            title="Reload the page?"
+            message="Your current image and edits will be lost — Unmark doesn't save anything."
+            confirmLabel="Reload"
+            cancelLabel="Keep editing"
+            danger
+            onConfirm={reloadNow}
+            onCancel={() => setReloadOpen(false)}
+          />
+        ) : null}
       </div>
     </EditorContext.Provider>
   );

@@ -106,12 +106,12 @@ export default function Controls() {
           </button>
         </div>
         {s.engine === "ml" ? (
-          <div className="rounded-md border border-line bg-bg2 px-3 py-2 text-[11.5px] leading-relaxed text-txt3">
+          <div className="rounded-md border border-[color-mix(in_srgb,var(--warn)_45%,var(--line))] bg-[color-mix(in_srgb,var(--warn)_14%,var(--bg2))] px-3 py-2 text-[11.5px] leading-relaxed text-txt2">
             Generative fill — reconstructs texture instead of smearing. First run downloads a
             ~30&nbsp;MB model (cached; offline after).
           </div>
         ) : s.engine === "lama" ? (
-          <div className="rounded-md border border-line bg-bg2 px-3 py-2 text-[11.5px] leading-relaxed text-txt3">
+          <div className="rounded-md border border-[color-mix(in_srgb,var(--danger)_45%,var(--line))] bg-[color-mix(in_srgb,var(--danger)_14%,var(--bg2))] px-3 py-2 text-[11.5px] leading-relaxed text-txt2">
             Highest quality — best for large, wide, or complex watermarks. First run downloads a
             ~200&nbsp;MB model (cached; offline after) and runs slower than AI eraser.
           </div>
