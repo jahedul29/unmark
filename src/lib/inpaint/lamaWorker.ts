@@ -3,14 +3,16 @@ import * as ort from "onnxruntime-web";
 ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.27.0/dist/";
 ort.env.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 4, 8);
 
-const MODEL_URL = "https://huggingface.co/lxfater/inpaint-web/resolve/main/migan.onnx";
+const MODEL_URL = "https://huggingface.co/Carve/LaMa-ONNX/resolve/main/lama_fp32.onnx";
 const MODEL_CACHE = "unmark-models";
+const IMG_IN = "image";
+const MASK_IN = "mask";
 const S = 512;
 const HW = S * S;
 const THR = 10;
 const OVERLAP = 64;
 const STRIDE = S - OVERLAP;
-const MAX_TILES = 16;
+const MAX_TILES = 6;
 const DILATE = 4;
 
 type Req =
@@ -49,7 +51,7 @@ function getSession(onProgress: (pct: number) => void): Promise<ort.InferenceSes
   sessionPromise = (async () => {
     const buf = await loadModelBuffer(onProgress);
     return ort.InferenceSession.create(new Uint8Array(buf), {
-      executionProviders: ["webgpu", "wasm"],
+      executionProviders: ["wasm"],
     });
   })().catch((e) => {
     sessionPromise = null;
@@ -143,24 +145,25 @@ async function inferTile(
   tileRGBA: Uint8ClampedArray,
   hole: Uint8Array,
 ): Promise<Uint8ClampedArray> {
-  const input = new Float32Array(4 * HW);
+  const imgT = new Float32Array(3 * HW);
+  const maskT = new Float32Array(HW);
   for (let i = 0; i < HW; i++) {
-    const known = hole[i] ? 0 : 1;
-    input[i] = known - 0.5;
-    input[HW + i] = (tileRGBA[i * 4] * 2 / 255 - 1) * known;
-    input[2 * HW + i] = (tileRGBA[i * 4 + 1] * 2 / 255 - 1) * known;
-    input[3 * HW + i] = (tileRGBA[i * 4 + 2] * 2 / 255 - 1) * known;
+    imgT[i] = tileRGBA[i * 4] / 255;
+    imgT[HW + i] = tileRGBA[i * 4 + 1] / 255;
+    imgT[2 * HW + i] = tileRGBA[i * 4 + 2] / 255;
+    maskT[i] = hole[i] ? 1 : 0;
   }
   const feeds: Record<string, ort.Tensor> = {
-    [session.inputNames[0]]: new ort.Tensor("float32", input, [1, 4, S, S]),
+    [IMG_IN]: new ort.Tensor("float32", imgT, [1, 3, S, S]),
+    [MASK_IN]: new ort.Tensor("float32", maskT, [1, 1, S, S]),
   };
   const output = await session.run(feeds);
   const out = output[session.outputNames[0]].data as Float32Array;
   const res = new Uint8ClampedArray(4 * HW);
   for (let i = 0; i < HW; i++) {
-    res[i * 4] = clamp255((out[i] + 1) * 127.5);
-    res[i * 4 + 1] = clamp255((out[HW + i] + 1) * 127.5);
-    res[i * 4 + 2] = clamp255((out[2 * HW + i] + 1) * 127.5);
+    res[i * 4] = clamp255(out[i]);
+    res[i * 4 + 1] = clamp255(out[HW + i]);
+    res[i * 4 + 2] = clamp255(out[2 * HW + i]);
     res[i * 4 + 3] = 255;
   }
   return res;
@@ -172,6 +175,7 @@ async function inpaintRegion(
   procMask: Surface,
   PW: number,
   PH: number,
+  onProgress: (p: number) => void,
 ): Promise<Surface> {
   const fill = makeCanvas(PW, PH);
 
@@ -183,8 +187,12 @@ async function inpaintRegion(
     const accB = new Float32Array(PW * PH);
     const wsum = new Float32Array(PW * PH);
 
+    let done = 0;
+    const total = xs.length * ys.length;
     for (const oy of ys) {
       for (const ox of xs) {
+        onProgress(done / total);
+        done++;
         const tMask = makeCanvas(S, S);
         tMask.g.imageSmoothingEnabled = false;
         tMask.g.drawImage(procMask.c, ox, oy, S, S, 0, 0, S, S);
@@ -231,6 +239,7 @@ async function inpaintRegion(
       }
     }
     fill.g.putImageData(fd, 0, 0);
+    onProgress(1);
     return fill;
   }
 
@@ -258,10 +267,14 @@ async function inpaintRegion(
   resSurface.g.putImageData(rimg, 0, 0);
   fill.g.imageSmoothingEnabled = true;
   fill.g.drawImage(resSurface.c, 0, 0, dw, dh, 0, 0, PW, PH);
+  onProgress(1);
   return fill;
 }
 
-async function runInpaint(msg: Extract<Req, { type: "inpaint" }>): Promise<ArrayBuffer> {
+async function runInpaint(
+  msg: Extract<Req, { type: "inpaint" }>,
+  onProgress: (p: number) => void,
+): Promise<ArrayBuffer> {
   const { width: W, height: H } = msg;
   const image = new Uint8ClampedArray(msg.image);
   const mask = new Uint8ClampedArray(msg.mask);
@@ -270,7 +283,7 @@ async function runInpaint(msg: Extract<Req, { type: "inpaint" }>): Promise<Array
   const b = maskBounds(mask, W, H);
   if (!b) return result.buffer;
 
-  const pad = Math.round(Math.max(b.w, b.h) * 0.35) + 24;
+  const pad = Math.round(Math.max(b.w, b.h) * 0.18) + 16;
   let rx = b.x - pad;
   let ry = b.y - pad;
   let rw = b.w + pad * 2;
@@ -304,7 +317,7 @@ async function runInpaint(msg: Extract<Req, { type: "inpaint" }>): Promise<Array
   procMask.g.drawImage(fullMask.c, rx, ry, rw, rh, 0, 0, PW, PH);
 
   const session = await getSession(() => {});
-  const fill = await inpaintRegion(session, procImg, procMask, PW, PH);
+  const fill = await inpaintRegion(session, procImg, procMask, PW, PH, onProgress);
 
   const fillFull = makeCanvas(rw, rh);
   fillFull.g.imageSmoothingEnabled = sc > 1;
@@ -338,7 +351,7 @@ ctx.addEventListener("message", async (ev: MessageEvent) => {
       return;
     }
     if (msg.type === "inpaint") {
-      const buffer = await runInpaint(msg);
+      const buffer = await runInpaint(msg, (pct) => ctx.postMessage({ type: "progress", pct }));
       ctx.postMessage({ type: "result", id: msg.id, buffer }, [buffer]);
     }
   } catch (err) {

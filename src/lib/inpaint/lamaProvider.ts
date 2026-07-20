@@ -5,7 +5,7 @@ interface Pending {
   reject: (e: Error) => void;
 }
 
-export class MLInpaintProvider implements InpaintProvider {
+export class LamaInpaintProvider implements InpaintProvider {
   private worker: Worker | null = null;
   private seq = 1;
   private pending = new Map<number, Pending>();
@@ -14,7 +14,7 @@ export class MLInpaintProvider implements InpaintProvider {
 
   private ensureWorker(): Worker {
     if (this.worker) return this.worker;
-    this.worker = new Worker(new URL("./mlWorker.ts", import.meta.url), { type: "module" });
+    this.worker = new Worker(new URL("./lamaWorker.ts", import.meta.url), { type: "module" });
     this.worker.onmessage = (e: MessageEvent) => {
       const { type, id } = e.data as { type: string; id: number };
       if (type === "progress") {
@@ -34,7 +34,7 @@ export class MLInpaintProvider implements InpaintProvider {
       }
     };
     this.worker.onerror = (e) => {
-      const err = new Error(e.message || "The AI engine failed to load.");
+      const err = new Error(e.message || "The high-quality engine failed to load.");
       for (const p of this.pending.values()) p.reject(err);
       this.pending.clear();
       this.worker?.terminate();
