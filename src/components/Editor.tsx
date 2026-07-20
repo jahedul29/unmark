@@ -5,12 +5,13 @@ import { useStore } from "@/lib/store";
 import { CanvasEngine, type EngineBridge } from "@/lib/engine/CanvasEngine";
 import { BrowserInpaintProvider } from "@/lib/inpaint/inpaintClient";
 import { MLInpaintProvider } from "@/lib/inpaint/mlProvider";
+import { LamaInpaintProvider } from "@/lib/inpaint/lamaProvider";
 import { TesseractDetector } from "@/lib/detect/textDetect";
 import { loadImageFile } from "@/lib/image/load";
 import { downloadImage, copyImageToClipboard, clipboardSupported } from "@/lib/image/exportImage";
 import { UnmarkFileError } from "@/lib/format";
 import { useShortcuts } from "@/lib/hooks/useShortcuts";
-import { useBeforeUnload } from "@/lib/hooks/useBeforeUnload";
+import { useReloadGuard } from "@/lib/hooks/useReloadGuard";
 import { EditorContext, type EditorApi } from "./editorContext";
 import type { Box } from "@/lib/types";
 
@@ -22,6 +23,7 @@ import CanvasView from "./CanvasView";
 import EmptyState from "./EmptyState";
 import MobileControls from "./MobileControls";
 import Toasts from "./Toasts";
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function Editor() {
   const setMany = useStore((s) => s.setMany);
@@ -38,14 +40,17 @@ export default function Editor() {
   const showBefore = useStore((s) => s.showBefore);
 
   const [suggest, setSuggest] = useState<Box[] | null>(null);
+  const [reloadOpen, setReloadOpen] = useState(false);
 
   const providerRef = useRef<BrowserInpaintProvider | null>(null);
   const mlRef = useRef<MLInpaintProvider | null>(null);
+  const lamaRef = useRef<LamaInpaintProvider | null>(null);
   const detectorRef = useRef<TesseractDetector | null>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
 
   if (!providerRef.current) providerRef.current = new BrowserInpaintProvider();
   if (!mlRef.current) mlRef.current = new MLInpaintProvider();
+  if (!lamaRef.current) lamaRef.current = new LamaInpaintProvider();
   if (!detectorRef.current) detectorRef.current = new TesseractDetector();
   if (!engineRef.current) {
     const bridge: EngineBridge = {
@@ -110,23 +115,30 @@ export default function Editor() {
     if (eng === "classic" && engine.getCoverage() > 0.5) {
       toast("warn", "Large area selected.", "Filling most of the image may look blurry.");
     }
-    if (eng === "ml") {
-      setMany({ busy: true, busyMsg: "Preparing AI…" });
+    const aiRef = eng === "ml" ? mlRef.current! : eng === "lama" ? lamaRef.current! : null;
+    if (aiRef) {
+      const sizeHint = eng === "lama" ? " (~200 MB, one time)" : "";
+      setMany({ busy: true, busyMsg: "Preparing…" });
       try {
-        await mlRef.current!.warmup((pct) =>
-          setMany({ busy: true, busyMsg: `Downloading AI model ${Math.round(pct * 100)}%` }),
+        await aiRef.warmup((pct) =>
+          setMany({ busy: true, busyMsg: `Downloading model ${Math.round(pct * 100)}%${sizeHint}` }),
         );
       } catch (err) {
         setMany({ busy: false, busyMsg: "" });
-        toast("error", "AI engine failed to load.", err instanceof Error ? err.message : undefined);
+        toast("error", "Engine failed to load.", err instanceof Error ? err.message : undefined);
         return;
       }
       setMany({ busyMsg: "Removing…" });
+      aiRef.setProgress((pct) =>
+        setMany({ busy: true, busyMsg: pct >= 1 ? "Finishing…" : `Removing… ${Math.round(pct * 100)}%` }),
+      );
     }
     try {
-      await engine.runInpaint(eng === "ml" ? mlRef.current! : providerRef.current!);
+      await engine.runInpaint(aiRef ?? providerRef.current!);
     } catch (err) {
       toast("error", "Couldn't remove that.", err instanceof Error ? err.message : undefined);
+    } finally {
+      aiRef?.setProgress(null);
     }
   }, [engine, setMany, toast]);
 
@@ -179,6 +191,34 @@ export default function Editor() {
     }
   }, [engine, setMany, toast]);
 
+  const findRepeats = useCallback(async () => {
+    const box = engine.getMaskBox();
+    if (!box) {
+      toast("info", "Mask one watermark first.", "Paint or box a single instance, then find repeats.");
+      return;
+    }
+    const id = engine.getWorkingImageData();
+    if (!id) return;
+    setMany({ busy: true, busyMsg: "Finding repeats…" });
+    try {
+      const boxes = await providerRef.current!.findRepeats(id.data, id.width, id.height, box);
+      if (boxes.length <= 1) {
+        toast("info", "No repeats found.", "Try a tighter selection around one watermark.");
+      } else {
+        setSuggest(boxes);
+        toast(
+          "info",
+          `Found ${boxes.length} matches.`,
+          "Remove any you don't want, then add them to the mask.",
+        );
+      }
+    } catch (err) {
+      toast("error", "Couldn't search for repeats.", err instanceof Error ? err.message : undefined);
+    } finally {
+      setMany({ busy: false, busyMsg: "" });
+    }
+  }, [engine, setMany, toast]);
+
   const fit = useCallback(() => engine.fit(), [engine]);
   const zoom100 = useCallback(() => engine.zoom100(), [engine]);
   const zoomBy = useCallback((f: number) => engine.zoomBy(f), [engine]);
@@ -205,6 +245,7 @@ export default function Editor() {
       download,
       copy,
       autoSuggest,
+      findRepeats,
       fit,
       zoom100,
       zoomBy,
@@ -223,6 +264,7 @@ export default function Editor() {
       download,
       copy,
       autoSuggest,
+      findRepeats,
       fit,
       zoom100,
       zoomBy,
@@ -234,7 +276,7 @@ export default function Editor() {
   );
 
   useShortcuts(api);
-  useBeforeUnload(hasImage);
+  const reloadNow = useReloadGuard(hasImage, useCallback(() => setReloadOpen(true), []));
 
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
@@ -243,9 +285,12 @@ export default function Editor() {
       loadFile,
       run,
       autoSuggest,
+      findRepeats,
+      commitSuggest,
+      getSuggest: () => suggest,
       getState: () => useStore.getState(),
     };
-  }, [engine, loadFile, run, autoSuggest]);
+  }, [engine, loadFile, run, autoSuggest, findRepeats, commitSuggest, suggest]);
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -272,6 +317,17 @@ export default function Editor() {
         <StatusBar />
         <MobileControls />
         <Toasts />
+        {reloadOpen ? (
+          <ConfirmDialog
+            title="Reload the page?"
+            message="Your current image and edits will be lost — Unmark doesn't save anything."
+            confirmLabel="Reload"
+            cancelLabel="Keep editing"
+            danger
+            onConfirm={reloadNow}
+            onCancel={() => setReloadOpen(false)}
+          />
+        ) : null}
       </div>
     </EditorContext.Provider>
   );

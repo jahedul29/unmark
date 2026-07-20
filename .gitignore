@@ -9,3 +9,6 @@ next-env.d.ts
 # local-only design docs
 /SPEC.md
 /FEATURES.md
+
+# large model (host on R2/CDN in prod)
+/public/models/

@@ -1,6 +1,6 @@
 export type Tool = "brush" | "eraser" | "rect" | "lasso";
 export type Algo = "telea" | "ns";
-export type EngineKind = "ml" | "classic";
+export type EngineKind = "ml" | "lama" | "classic";
 export type Theme = "dark" | "light";
 
 export interface ImageMeta {

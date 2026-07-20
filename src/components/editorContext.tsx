@@ -14,6 +14,7 @@ export interface EditorApi {
   download: () => Promise<void>;
   copy: () => Promise<void>;
   autoSuggest: () => Promise<void>;
+  findRepeats: () => Promise<void>;
   fit: () => void;
   zoom100: () => void;
   zoomBy: (f: number) => void;
