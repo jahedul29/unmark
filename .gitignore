@@ -6,9 +6,9 @@ next-env.d.ts
 .DS_Store
 .vercel
 
-# local-only design docs
-/SPEC.md
-/FEATURES.md
+# local-only agent context (Claude Code)
+/CLAUDE.md
+/.claude/
 
 # large model (host on R2/CDN in prod)
 /public/models/
