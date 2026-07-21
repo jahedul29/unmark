@@ -9,6 +9,7 @@ import { LamaInpaintProvider } from "@/lib/inpaint/lamaProvider";
 import { TesseractDetector } from "@/lib/detect/textDetect";
 import { loadImageFile } from "@/lib/image/load";
 import { downloadImage, copyImageToClipboard, clipboardSupported } from "@/lib/image/exportImage";
+import { track } from "@vercel/analytics";
 import { UnmarkFileError } from "@/lib/format";
 import { useShortcuts } from "@/lib/hooks/useShortcuts";
 import { useReloadGuard } from "@/lib/hooks/useReloadGuard";
@@ -92,6 +93,7 @@ export default function Editor() {
         await engine.load(bitmap, meta);
         setSuggest(null);
         setMany({ showBefore: false, sheetOpen: false });
+        track("image_loaded", { type: meta.type });
       } catch (err) {
         if (err instanceof UnmarkFileError) {
           toast(
@@ -135,6 +137,7 @@ export default function Editor() {
     }
     try {
       await engine.runInpaint(aiRef ?? providerRef.current!);
+      track("run", { engine: eng });
     } catch (err) {
       toast("error", "Couldn't remove that.", err instanceof Error ? err.message : undefined);
     } finally {
@@ -152,6 +155,7 @@ export default function Editor() {
     if (!c || !meta) return;
     try {
       await downloadImage(c, meta.type, meta.name);
+      track("download", { type: meta.type });
     } catch {
       toast("error", "Download failed.", "Try again.");
     }
@@ -162,6 +166,7 @@ export default function Editor() {
     if (!c) return;
     try {
       await copyImageToClipboard(c);
+      track("copy");
       toast("info", "Copied to clipboard.");
     } catch (err) {
       toast("error", "Couldn't copy.", err instanceof Error ? err.message : undefined);
@@ -178,6 +183,7 @@ export default function Editor() {
         toast("info", "No text found.", "Mask the watermark by hand instead.");
       } else {
         setSuggest(boxes);
+        track("auto_suggest", { found: boxes.length });
         toast(
           "info",
           `Found ${boxes.length} text ${boxes.length === 1 ? "region" : "regions"}.`,
@@ -206,6 +212,7 @@ export default function Editor() {
         toast("info", "No repeats found.", "Try a tighter selection around one watermark.");
       } else {
         setSuggest(boxes);
+        track("find_repeats", { matches: boxes.length });
         toast(
           "info",
           `Found ${boxes.length} matches.`,
